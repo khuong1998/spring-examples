@@ -13,7 +13,7 @@ import jakarta.validation.Payload;
 @Constraint(validatedBy = DynamicPatternValidator.class)
 public @interface DynamicPattern {
     String message() default "Định dạng không hợp lệ từ DB";
-    String key(); // Khóa để tìm Regex trong DB (ví dụ: "phone_regex")
+    String key();
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,41 +1,32 @@
 package com.ngk.authen.controller;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ngk.authen.exception.AppServiceException;
 import com.ngk.authen.model.api.register.UserDTO;
+import com.ngk.authen.model.api.register.UserRegisterRequest;
+import com.ngk.authen.services.UserService;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
+import jakarta.validation.Valid;
 
 @RestController
 public class UserRegisterController {
 	@Autowired
-    private Validator validator;
-	
-	@RequestMapping(value = "/register", method = RequestMethod.GET)
-	public ResponseEntity<UserDTO> register() {
-		UserDTO dto = new UserDTO();
-		dto.setName("asd");
-		dto.setEmail("asd");
-		dto.setPhone(null);
-		try {
-			Set<ConstraintViolation<UserDTO>> violations = validator.validate(dto);
-			violations.stream().forEach(e -> System.out.println(e.getMessage()));
-		} catch (Exception e) {
-			ResponseEntity<UserDTO> resp = ResponseEntity.internalServerError().body(dto);
-			return resp;
+	private UserService userService;
+
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	public ResponseEntity<UserDTO> register(@Valid @RequestBody UserRegisterRequest request) {
+//		UserRegisterRequest body = request.getBody();
+		UserDTO userResponse = userService.registerNewUser(request);
+		if (userResponse == null) {
+			throw new AppServiceException("Error while create user please check if information valid",
+					"ERR_USER_CREATE_ERROR");
 		}
-		ResponseEntity<UserDTO> resp = ResponseEntity.badRequest().body(dto);
-		return resp;
-	}
-	void testUser(@Validated UserDTO u) {
-		
+		return ResponseEntity.ok(userResponse);
 	}
 }

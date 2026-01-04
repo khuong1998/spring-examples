@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -18,12 +20,8 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
-				// 1. Cấu hình CORS (Thủ tục kiểm tra hộ chiếu tại cửa khẩu)
-				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-				// 2. Tắt CSRF (Tháo chốt lựu đạn - chỉ làm khi thực sự hiểu hoặc đang test)
-				.csrf(csrf -> csrf.disable())
-				// 3. Cho phép mọi Request (Ai vào cũng được)
-				.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+//				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+				.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
 		return http.build();
 	}
@@ -40,5 +38,10 @@ public class SecurityConfig {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
+	}
+
+	@Bean
+	public PasswordEncoder passEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 }
